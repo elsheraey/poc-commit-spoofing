@@ -1,2 +1,3 @@
 init
 auth: refresh
+log: json
