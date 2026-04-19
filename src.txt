@@ -4,3 +4,4 @@ log: json
 flags: off
 config: v2
 tests: ok
+typo fixed
