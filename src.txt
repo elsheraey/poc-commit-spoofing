@@ -1,3 +1,4 @@
 init
 auth: refresh
 log: json
+flags: off
