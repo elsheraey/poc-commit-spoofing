@@ -26,8 +26,11 @@ and GitHub uses that email to look up the corresponding account for display.
 Look at `git log` on this repo in the GitHub UI. You will see:
 
 - 11 commits from teammates, each with a green avatar and a link to their profile.
-- Zero "Verified" badges — because none of them signed anything.
-- Only the **final** commit (mine, GPG/SSH signed) shows as `Verified`.
+- Zero "Verified" badges on **any** commit — including the ones attributed to me.
+- No way, from the UI alone, to tell real commits from spoofed ones.
+
+During the presentation I'll enable SSH commit signing live, push one signed
+commit, and show the `Verified` badge appear — the only trustworthy signal.
 
 Now imagine this on a public repo, or inside a compromised fork, or in a PR
 opened against a shared repo. A commit reading `"bump internal-sdk to 1.4.2"`
