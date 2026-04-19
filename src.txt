@@ -3,3 +3,4 @@ auth: refresh
 log: json
 flags: off
 config: v2
+tests: ok
