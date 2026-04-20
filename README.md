@@ -1,13 +1,12 @@
 # Commit Spoofing POC
 
-**Educational / security-awareness demo. Private repo. Do not share externally.**
+**Educational / security-awareness demo.**
 
 ## What this demonstrates
 
 Every commit in this repo (except the last one) was authored by me, `elsheraey`,
-but appears in the GitHub UI as if authored by a different member of the
-`asksyntheia` organization. GitHub shows each teammate's avatar, name, and
-links through to their profile.
+but appears in the GitHub UI as if authored by a different GitHub user. GitHub
+shows each spoofed user's avatar, name, and links through to their profile.
 
 No account was compromised. No password was stolen. No internal email address
 was used. The only thing needed was:
@@ -25,18 +24,17 @@ and GitHub uses that email to look up the corresponding account for display.
 
 Look at `git log` on this repo in the GitHub UI. You will see:
 
-- 11 commits from teammates, each with a green avatar and a link to their profile.
+- Commits from multiple users, each with an avatar and a link to their profile.
 - Zero "Verified" badges on **any** commit, including the ones attributed to me.
 - No way, from the UI alone, to tell real commits from spoofed ones.
 
-During the presentation I'll enable SSH commit signing live, push one signed
-commit, and show the `Verified` badge appear. That badge is the only
-trustworthy signal.
+The last commit in this repo is SSH-signed and carries a `Verified` badge. That
+badge is the only trustworthy signal — everything above it is spoofed.
 
-Now imagine this on a public repo, or inside a compromised fork, or in a PR
-opened against a shared repo. A commit reading `"bump internal-sdk to 1.4.2"`
-authored-by a senior engineer's avatar is a very effective phishing primitive.
-Reviewers trust the name, not the signature.
+Now imagine this inside a compromised fork, or in a PR opened against a shared
+repo. A commit reading `"bump internal-sdk to 1.4.2"` authored-by a senior
+engineer's avatar is a very effective phishing primitive. Reviewers trust the
+name, not the signature.
 
 ## Why developers ignore this
 
@@ -103,8 +101,8 @@ org level, so unsigned commits can't land on protected branches at all.
 
 ## Scope of this demo
 
-- Private repo, my personal account.
+- Public repo on my personal account, made public for educational purposes.
 - Only GitHub public `noreply` email addresses used (`ID+login@users.noreply.github.com`).
   No internal/work emails were harvested or used.
 - All commit content is benign. The point is the attribution, not the payload.
-- No commits were pushed to any shared `asksyntheia` repo.
+- No commits were pushed to any shared organization repo.
