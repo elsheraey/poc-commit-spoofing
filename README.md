@@ -1,9 +1,7 @@
 # Commit Spoofing POC
 
-**Educational / security-awareness demo.**
-
-Originally built as a security-awareness exercise for team members at
-[Syntheia](https://syntheia.io), shared publicly in case it's useful to others.
+**Educational / security-awareness demo, originally built for team members at
+[Syntheia](https://syntheia.io) and shared publicly in case it's useful to others.**
 
 ## What this demonstrates
 
