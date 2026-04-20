@@ -2,6 +2,9 @@
 
 **Educational / security-awareness demo.**
 
+Originally built as a security-awareness exercise for team members at
+[Syntheia](https://syntheia.io), shared publicly in case it's useful to others.
+
 ## What this demonstrates
 
 Every commit in this repo (except the last one) was authored by me, `elsheraey`,
