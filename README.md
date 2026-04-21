@@ -3,7 +3,25 @@
 **Educational / security-awareness demo, originally built for team members at
 [Syntheia](https://syntheia.io) and shared publicly in case it's useful to others.**
 
-## Why this is possible at all (some context from me)
+## What this demonstrates
+
+Every commit in this repo (except the last one) was authored by me, `elsheraey`,
+but appears in the GitHub UI as if authored by a different GitHub user. GitHub
+shows each spoofed user's avatar, name, and links through to their profile.
+
+No account was compromised. No password was stolen. No internal email address
+was used. The only thing needed was:
+
+```bash
+git -c user.name="Teammate Name" \
+    -c user.email="ID+login@users.noreply.github.com" \
+    commit --allow-empty -m "looks legit"
+```
+
+That's the entire "attack." Git trusts whatever you put in `user.email` locally,
+and GitHub uses that email to look up the corresponding account for display.
+
+## Why this is possible at all
 
 This isn't a bug. It's a consequence of what Git was designed to be.
 
@@ -39,26 +57,6 @@ do. The gap is between Git's original threat model (trusted maintainers
 exchanging patches) and how we use it today (strangers opening PRs into
 shared repos, AI bots auto-merging on identity signals).
 
-— Mourad
-
-## What this demonstrates
-
-Every commit in this repo (except the last one) was authored by me, `elsheraey`,
-but appears in the GitHub UI as if authored by a different GitHub user. GitHub
-shows each spoofed user's avatar, name, and links through to their profile.
-
-No account was compromised. No password was stolen. No internal email address
-was used. The only thing needed was:
-
-```bash
-git -c user.name="Teammate Name" \
-    -c user.email="ID+login@users.noreply.github.com" \
-    commit --allow-empty -m "looks legit"
-```
-
-That's the entire "attack." Git trusts whatever you put in `user.email` locally,
-and GitHub uses that email to look up the corresponding account for display.
-
 ## Why this matters
 
 Look at `git log` on this repo in the GitHub UI. You will see:
@@ -74,6 +72,47 @@ Now imagine this inside a compromised fork, or in a PR opened against a shared
 repo. A commit reading `"bump internal-sdk to 1.4.2"` authored-by a senior
 engineer's avatar is a very effective phishing primitive. Reviewers trust the
 name, not the signature.
+
+## The AI and auto-merge angle
+
+The risk is growing, not shrinking, because more of the review pipeline is
+now automated and identity-aware:
+
+- **AI code reviewers** (Copilot review, CodeRabbit, Cursor review bots,
+  in-house LLM reviewers) often receive author metadata alongside the
+  diff, and can weight "this is from a trusted senior engineer" as a
+  reason to approve faster or comment less critically. A spoofed identity
+  inherits that trust for free. See Manifold Security's write-up of an
+  AI reviewer being fooled by a spoofed git identity:
+  https://www.manifold.security/blog/spoofed-git-identity-ai-code-reviewer
+- **Auto-merge rules** keyed on author (e.g. "auto-merge if author is in
+  the `core` team" or "skip review if author is Dependabot") can be
+  short-circuited by a spoofed `user.email`. The merge queue never sees
+  the attacker, only the impersonated identity.
+- **CODEOWNERS bypass patterns.** Some pipelines treat commits authored
+  by an owner as implicitly pre-reviewed. A spoof collapses that check.
+- **Bot impersonation.** Spoofing `dependabot[bot]` or a release bot
+  makes a malicious commit look like routine automation, precisely the
+  kind of change humans skim rather than review.
+
+None of these systems should trust `user.email`. The only field worth
+trusting is the cryptographic signature.
+
+Slide deck with more background on this angle, authored by Nada Abdalla:
+[`commit-spoofing-nada-abdalla.pdf`](./commit-spoofing-nada-abdalla.pdf).
+
+## Real incidents this enables or amplifies
+
+- **xz-utils (CVE-2024-3094).** Multi-year social engineering. Commit
+  attribution was a forensic anchor after the fact; signing would have
+  raised the bar.
+- **PR phishing.** Spoofed maintainer commits in opened PRs have been
+  demonstrated against Google, Linux kernel contributors, and others.
+- **Internal threat.** A disgruntled employee can make it look as if any
+  coworker authored a controversial change, or hide their own authorship
+  of a change they do not want traced back to them.
+- **Contribution fraud.** Farming green squares or faking a contribution
+  history for hiring and reputation purposes.
 
 ## Why developers ignore this
 
@@ -111,47 +150,6 @@ practice? A few honest reasons:
 
 The fix isn't persuading individuals. It's flipping the default at the
 org level, so unsigned commits can't land on protected branches at all.
-
-## Real incidents this enables or amplifies
-
-- **xz-utils (CVE-2024-3094).** Multi-year social engineering. Commit
-  attribution was a forensic anchor after the fact; signing would have
-  raised the bar.
-- **PR phishing.** Spoofed maintainer commits in opened PRs have been
-  demonstrated against Google, Linux kernel contributors, and others.
-- **Internal threat.** A disgruntled employee can make it look as if any
-  coworker authored a controversial change, or hide their own authorship
-  of a change they do not want traced back to them.
-- **Contribution fraud.** Farming green squares or faking a contribution
-  history for hiring and reputation purposes.
-
-## The AI and auto-merge angle
-
-The risk is growing, not shrinking, because more of the review pipeline is
-now automated and identity-aware:
-
-- **AI code reviewers** (Copilot review, CodeRabbit, Cursor review bots,
-  in-house LLM reviewers) often receive author metadata alongside the
-  diff, and can weight "this is from a trusted senior engineer" as a
-  reason to approve faster or comment less critically. A spoofed identity
-  inherits that trust for free. See Manifold Security's write-up of an
-  AI reviewer being fooled by a spoofed git identity:
-  https://www.manifold.security/blog/spoofed-git-identity-ai-code-reviewer
-- **Auto-merge rules** keyed on author (e.g. "auto-merge if author is in
-  the `core` team" or "skip review if author is Dependabot") can be
-  short-circuited by a spoofed `user.email`. The merge queue never sees
-  the attacker, only the impersonated identity.
-- **CODEOWNERS bypass patterns.** Some pipelines treat commits authored
-  by an owner as implicitly pre-reviewed. A spoof collapses that check.
-- **Bot impersonation.** Spoofing `dependabot[bot]` or a release bot
-  makes a malicious commit look like routine automation, precisely the
-  kind of change humans skim rather than review.
-
-None of these systems should trust `user.email`. The only field worth
-trusting is the cryptographic signature.
-
-Slide deck with more background on this angle, authored by Nada Abdalla:
-[`commit-spoofing-nada-abdalla.pdf`](./commit-spoofing-nada-abdalla.pdf).
 
 ## How to stop it
 
