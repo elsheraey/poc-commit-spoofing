@@ -73,7 +73,7 @@ repo. A commit reading `"bump internal-sdk to 1.4.2"` authored-by a senior
 engineer's avatar is a very effective phishing primitive. Reviewers trust the
 name, not the signature.
 
-## The AI and auto-merge angle
+## The AI and auto-merge angle ([Nada Abdallah](https://github.com/Nada-Abdalla))
 
 The risk is growing, not shrinking, because more of the review pipeline is
 now automated and identity-aware:
