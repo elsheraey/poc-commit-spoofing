@@ -82,7 +82,38 @@ org level, so unsigned commits can't land on protected branches at all.
 - **PR phishing.** Spoofed maintainer commits in opened PRs have been
   demonstrated against Google, Linux kernel contributors, and others.
 - **Internal threat.** A disgruntled employee can make it look as if any
-  coworker authored a controversial change.
+  coworker authored a controversial change, or hide their own authorship
+  of a change they do not want traced back to them.
+- **Contribution fraud.** Farming green squares or faking a contribution
+  history for hiring and reputation purposes.
+
+## The AI and auto-merge angle
+
+The risk is growing, not shrinking, because more of the review pipeline is
+now automated and identity-aware:
+
+- **AI code reviewers** (Copilot review, CodeRabbit, Cursor review bots,
+  in-house LLM reviewers) often receive author metadata alongside the
+  diff, and can weight "this is from a trusted senior engineer" as a
+  reason to approve faster or comment less critically. A spoofed identity
+  inherits that trust for free. See Manifold Security's write-up of an
+  AI reviewer being fooled by a spoofed git identity:
+  https://www.manifold.security/blog/spoofed-git-identity-ai-code-reviewer
+- **Auto-merge rules** keyed on author (e.g. "auto-merge if author is in
+  the `core` team" or "skip review if author is Dependabot") can be
+  short-circuited by a spoofed `user.email`. The merge queue never sees
+  the attacker, only the impersonated identity.
+- **CODEOWNERS bypass patterns.** Some pipelines treat commits authored
+  by an owner as implicitly pre-reviewed. A spoof collapses that check.
+- **Bot impersonation.** Spoofing `dependabot[bot]` or a release bot
+  makes a malicious commit look like routine automation, precisely the
+  kind of change humans skim rather than review.
+
+None of these systems should trust `user.email`. The only field worth
+trusting is the cryptographic signature.
+
+Slide deck with more background on this angle, authored by Nada Abdalla:
+[`commit-spoofing-nada-abdalla.pdf`](./commit-spoofing-nada-abdalla.pdf).
 
 ## How to stop it
 
