@@ -3,6 +3,44 @@
 **Educational / security-awareness demo, originally built for team members at
 [Syntheia](https://syntheia.io) and shared publicly in case it's useful to others.**
 
+## Why this is possible at all (some context from me)
+
+This isn't a bug. It's a consequence of what Git was designed to be.
+
+Linus Torvalds built Git in 2005 to replace BitKeeper for Linux kernel
+development, and the original priorities were:
+
+- **Distributed development.** Every clone is a full, equal repository.
+  There is no central authority to ask "is this really you?" because by
+  design there is no central authority at all.
+- **Performance and scalability.** Fast enough to handle thousands of
+  patches flowing through mailing lists every week, on the hardware of
+  2005. Cryptographic identity checks on every commit were not on the
+  table.
+- **Content integrity, not author identity.** Git uses SHA-1 (now also
+  SHA-256) to guarantee that the *contents* of a commit haven't been
+  tampered with after the fact. The author field is metadata attached to
+  that content, not something the hash is meant to authenticate.
+
+In the kernel workflow those tradeoffs were fine: patches arrived by
+email, were reviewed by humans who knew each other, and maintainers signed
+the *tags* they pulled rather than every individual commit. Trust lived
+in the social graph of maintainers, not in the commit object.
+
+GitHub inherited Git's data model and layered a social UI on top, turning
+author metadata into avatars, profile links, and contribution graphs.
+That UI promotes the author field from "a note from the committer" to "an
+identity claim," without adding any mechanism to verify the claim. Signed
+commits and the `Verified` badge are the retrofit. They're opt-in because
+they were bolted on afterwards, not built in from day one.
+
+So the spoof works because Git is doing exactly what it was designed to
+do. The gap is between Git's original threat model (trusted maintainers
+exchanging patches) and how we use it today (strangers opening PRs into
+shared repos, AI bots auto-merging on identity signals).
+
+— Mourad
+
 ## What this demonstrates
 
 Every commit in this repo (except the last one) was authored by me, `elsheraey`,
